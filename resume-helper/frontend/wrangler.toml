@@ -1,4 +1,4 @@
-name = "magic-resume"
+name = "resume-helper"
 main = "dist/server/server.js"
 compatibility_date = "2026-03-09"
 compatibility_flags = ["nodejs_compat"]
