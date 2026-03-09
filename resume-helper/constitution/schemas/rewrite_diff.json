@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RewriteDiff",
+  "description": "简历改写对比记录",
+  "type": "object",
+  "required": ["version_from", "version_to", "changes"],
+  "properties": {
+    "version_from": { "type": "integer" },
+    "version_to": { "type": "integer" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "trigger": { "type": "string", "enum": ["jd_optimization", "keyword_optimization", "style_change", "user_edit", "feedback"] },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "field", "action"],
+        "properties": {
+          "section": { "type": "string", "description": "变更所在区域，如work_experience[0].responsibilities[1]" },
+          "field": { "type": "string" },
+          "action": { "type": "string", "enum": ["added", "modified", "reordered", "style_changed"] },
+          "original": { "type": ["string", "null"] },
+          "modified": { "type": "string" },
+          "reason": { "type": "string", "description": "改写原因" },
+          "jd_reference": { "type": ["string", "null"], "description": "对应的JD要求" }
+        }
+      }
+    },
+    "summary": { "type": "string", "description": "变更摘要" }
+  }
+}

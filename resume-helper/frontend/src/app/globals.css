@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 隐藏数字输入框自带的上下箭头 */
+@layer utilities {
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .no-spinner {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 216 20% 97%; /* #F5F7FA - 清爽冷白 */
+    --foreground: 220 15% 16%; /* #232830 - 深墨灰 */
+    --card: 0 0% 100%; /* #FFFFFF - 纯白卡片 */
+    --card-foreground: 220 15% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 16%;
+    --primary: 224 60% 48%; /* #3163C9 - 专业蓝 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 216 18% 93%; /* #EBEEF3 - 浅灰蓝 */
+    --secondary-foreground: 220 15% 16%;
+    --muted: 216 10% 62%; /* #929BAA - 中灰 */
+    --muted-foreground: 216 10% 45%;
+    --accent: 216 16% 94%; /* #EDF0F4 - 淡蓝灰 */
+    --accent-foreground: 220 15% 16%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 216 14% 90%; /* #E2E6EC - 柔和边框 */
+    --input: 216 14% 90%;
+    --ring: 224 60% 48%;
+    --radius: 0.75rem;
+    --chart-1: 224 60% 48%;
+    --chart-2: 160 50% 42%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 38 70% 55%;
+    --chart-5: 280 50% 55%;
+    --sidebar-background: 220 18% 96%; /* #F2F4F8 - 侧边栏底色 */
+    --sidebar-foreground: 220 12% 30%;
+    --sidebar-primary: 224 60% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 16% 92%;
+    --sidebar-accent-foreground: 224 60% 48%;
+    --sidebar-border: 216 14% 88%;
+    --sidebar-ring: 224 60% 48%;
+
+    /* Assistant neutral palette */
+    --assistant-bg: #f7f8fa;
+    --assistant-surface: #f2f4f6;
+    --assistant-card: #f8f9fb;
+    --assistant-border: #e2e6eb;
+    --assistant-text-primary: #2f3640;
+    --assistant-text-secondary: #5f6976;
+    --assistant-text-tertiary: #7c8592;
+    --assistant-text-quaternary: #98a1ad;
+    --assistant-accent: #667487;
+    --assistant-accent-soft: #edf1f5;
+    --assistant-success: #697f71;
+    --assistant-success-soft: #edf3ef;
+    --assistant-warning: #847760;
+    --assistant-warning-soft: #f3f0ea;
+    --assistant-danger: #8b6b6b;
+    --assistant-danger-soft: #f5eeee;
+  }
+  /* 通用滚动条样式 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  /* hide vertical scrollbar */
+  /* ::-webkit-scrollbar-thumb:vertical {
+    background: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  *:hover::-webkit-scrollbar-thumb:vertical {
+    background: rgba(193, 193, 193, 0.5);
+  }
+
+  ::-webkit-scrollbar-thumb:vertical:hover {
+    background: rgba(193, 193, 193, 0.8);
+  } */
+
+  /* show horizontal scrollbar */
+  ::-webkit-scrollbar-thumb:horizontal {
+    background: rgba(193, 193, 193, 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:horizontal:hover {
+    background: rgba(193, 193, 193, 0.8);
+  }
+
+  .dark {
+    --background: 218 45% 8%; /* #0B1421 */
+    --foreground: 213 20% 92%; /* #DEE7F3 */
+    --card: 218 34% 13%; /* #162132 */
+    --card-foreground: 213 20% 92%;
+    --popover: 218 34% 13%;
+    --popover-foreground: 213 20% 92%;
+    --primary: 213 52% 36%; /* #2C578B */
+    --primary-foreground: 210 40% 97%;
+    --secondary: 218 28% 17%; /* #1E2B3E */
+    --secondary-foreground: 212 24% 88%;
+    --muted: 216 18% 45%;
+    --muted-foreground: 216 14% 68%;
+    --accent: 218 28% 17%;
+    --accent-foreground: 212 24% 88%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 217 24% 25%; /* #2A3D56 */
+    --input: 217 24% 25%;
+    --ring: 213 52% 45%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --sidebar-background: 218 44% 9%;
+    --sidebar-foreground: 212 22% 86%;
+    --sidebar-primary: 213 52% 36%;
+    --sidebar-primary-foreground: 210 40% 97%;
+    --sidebar-accent: 218 28% 16%;
+    --sidebar-accent-foreground: 212 20% 88%;
+    --sidebar-border: 217 23% 23%;
+    --sidebar-ring: 213 52% 45%;
+
+    /* Assistant neutral palette (dark) */
+    --assistant-bg: #0e1623;
+    --assistant-surface: #162233;
+    --assistant-card: #1b2a3d;
+    --assistant-border: #2b3f59;
+    --assistant-text-primary: #dbe5f2;
+    --assistant-text-secondary: #b8c6d9;
+    --assistant-text-tertiary: #97abc4;
+    --assistant-text-quaternary: #7f95af;
+    --assistant-accent: #9ab0cc;
+    --assistant-accent-soft: #24364d;
+    --assistant-success: #a4c4ad;
+    --assistant-success-soft: #24372d;
+    --assistant-warning: #c7bb99;
+    --assistant-warning-soft: #3a3528;
+    --assistant-danger: #cca9a9;
+    --assistant-danger-soft: #3d2b2b;
+  }
+}
+
+@layer components {
+  .assistant-surface {
+    background-color: var(--assistant-surface);
+    border-color: var(--assistant-border);
+    color: var(--assistant-text-primary);
+  }
+
+  .assistant-card {
+    background-color: var(--assistant-card);
+    border: 1px solid var(--assistant-border);
+    box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+  }
+
+  .assistant-text-primary {
+    color: var(--assistant-text-primary);
+  }
+
+  .assistant-text-secondary {
+    color: var(--assistant-text-secondary);
+  }
+
+  .assistant-text-tertiary {
+    color: var(--assistant-text-tertiary);
+  }
+
+  .assistant-text-quaternary {
+    color: var(--assistant-text-quaternary);
+  }
+
+  .assistant-accent {
+    color: var(--assistant-accent);
+  }
+
+  .resume-color-picker .react-colorful__pointer {
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.22);
+  }
+
+  .resume-color-picker .react-colorful__saturation {
+    box-shadow: inset 0 0 0 1px hsl(var(--border));
+  }
+
+  .dark .resume-color-picker .react-colorful__pointer {
+    background-color: hsl(var(--card));
+    border-color: hsl(var(--border));
+    box-shadow: 0 1px 3px rgba(2, 6, 23, 0.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Normalize native color input style to avoid default white swatch borders. */
+  input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 2px);
+    padding: 2px;
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  body.workbench-body-lock {
+    overflow-y: hidden;
+  }
+
+
+  /* Apply serif to all headings globally except in resume preview */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+
+  /* Reset headings in resume preview to inherit or use sans */
+  #resume-preview h1, 
+  #resume-preview h2, 
+  #resume-preview h3, 
+  #resume-preview h4, 
+  #resume-preview h5, 
+  #resume-preview h6 {
+    font-family: inherit;
+  }
+
+  ::-moz-selection {
+    @apply text-primary-foreground bg-primary;
+  }
+
+  /* Fix Chrome extension screenshot problem, no impact on this project */
+  img,
+  svg {
+    @apply inline-block;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes tilt {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.5deg);
+  }
+  75% {
+    transform: rotate(-0.5deg);
+  }
+}
+
+@keyframes gradient-xy {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-tilt {
+  animation: tilt 10s infinite linear;
+}
+
+.animate-gradient-xy {
+  animation: gradient-xy 15s ease infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* .custom-list,
+.custom-list-ordered {
+  list-style-type: none;
+}
+
+.custom-list li::marker,
+.custom-list-ordered li::marker {
+  display: none;
+} */
+
+/* .custom-list li::before {
+  content: "•";
+  display: inline-block;
+  margin-right: 10px;
+} */
+
+/* .custom-list-ordered li::before {
+  content: counter(list-0, decimal) ". ";
+  counter-increment: list-0;
+  display: inline-block;
+  margin-right: 5px;
+} */
+
+.custom-list {
+  list-style-type: disc;
+  padding-left: 1.2rem;
+}
+
+.custom-list-ordered {
+  list-style-position: inside;
+  list-style-type: decimal;
+
+  p {
+    display: inline;
+  }
+  /* 次级需要特殊处理 */
+  .custom-list-ordered {
+    padding: 0 1.2rem;
+  }
+}

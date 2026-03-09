@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ATSScorecard",
+  "description": "ATS审计评分卡",
+  "type": "object",
+  "required": ["overall_score", "format_risk", "keyword_coverage", "dimensions"],
+  "properties": {
+    "overall_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "format_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+    "keyword_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+    "dimensions": {
+      "type": "object",
+      "properties": {
+        "structure": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number" },
+            "issues": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "keywords": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number" },
+            "matched": { "type": "array", "items": { "type": "string" } },
+            "gaps": { "type": "array", "items": { "type": "string" } },
+            "evidence_rate": { "type": "number", "description": "关键词在经历bullet中出现的比例" }
+          }
+        },
+        "formatting": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number" },
+            "issues": { "type": "array", "items": { "type": "string" } },
+            "checks": {
+              "type": "object",
+              "properties": {
+                "single_column": { "type": "boolean" },
+                "no_tables": { "type": "boolean" },
+                "no_headers_footers": { "type": "boolean" },
+                "no_text_boxes": { "type": "boolean" },
+                "no_images": { "type": "boolean" },
+                "contact_in_body": { "type": "boolean" },
+                "consistent_dates": { "type": "boolean" },
+                "file_size_ok": { "type": "boolean" }
+              }
+            }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "number" },
+            "suggestions": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "rewrite_suggestions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "original": { "type": "string" },
+          "suggested": { "type": "string" },
+          "reason": { "type": "string" },
+          "jd_requirement": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "resume-helper-root",
+  "private": true,
+  "scripts": {
+    "dev": "cd resume-helper && npm run dev",
+    "dev:backend": "cd resume-helper && npm run dev:backend",
+    "dev:frontend": "cd resume-helper && npm run dev:frontend",
+    "build": "cd resume-helper && npm run build",
+    "start": "cd resume-helper && npm run start",
+    "test": "cd resume-helper && npm run test"
+  },
+  "dependencies": {
+    "docx": "^9.6.0"
+  }
+}

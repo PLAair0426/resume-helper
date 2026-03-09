@@ -1,0 +1,20 @@
+{
+  "zh": {
+    "leadership": ["主导", "牵头", "统筹", "负责", "带领", "推动", "引领", "组织"],
+    "achievement": ["实现", "达成", "完成", "突破", "提升", "优化", "改善", "降低"],
+    "analysis": ["分析", "研究", "调研", "评估", "诊断", "洞察", "拆解", "梳理"],
+    "creation": ["搭建", "构建", "设计", "开发", "创建", "制定", "建立", "打造"],
+    "collaboration": ["协调", "对接", "沟通", "配合", "联动", "整合", "协同"],
+    "management": ["管理", "监控", "跟踪", "维护", "运营", "调度", "把控"],
+    "growth": ["拓展", "开发", "挖掘", "孵化", "裂变", "转化", "促成"]
+  },
+  "en": {
+    "leadership": ["Led", "Spearheaded", "Directed", "Orchestrated", "Championed", "Drove"],
+    "achievement": ["Achieved", "Delivered", "Exceeded", "Boosted", "Improved", "Reduced", "Increased"],
+    "analysis": ["Analyzed", "Evaluated", "Assessed", "Identified", "Diagnosed", "Investigated"],
+    "creation": ["Built", "Designed", "Developed", "Created", "Established", "Launched", "Implemented"],
+    "collaboration": ["Collaborated", "Partnered", "Coordinated", "Facilitated", "Aligned"],
+    "management": ["Managed", "Oversaw", "Monitored", "Maintained", "Administered", "Streamlined"],
+    "growth": ["Expanded", "Grew", "Scaled", "Acquired", "Cultivated", "Generated"]
+  }
+}
