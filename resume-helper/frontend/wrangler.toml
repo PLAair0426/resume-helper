@@ -7,7 +7,7 @@ workers_dev = true
 preview_urls = true
 
 [[routes]]
-pattern = "resume-helper.sydbw.cc.cd"
+pattern = "www.resume-helper.sydbw.cc.cd"
 custom_domain = true
 
 [assets]
