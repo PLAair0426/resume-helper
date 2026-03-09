@@ -63,6 +63,32 @@ interface ProviderAliasConfig {
 const GENERIC_API_KEY_ALIASES = ["OPENAI_API_KEY", "API_KEY"];
 const GENERIC_BASE_URL_ALIASES = ["OPENAI_BASE_URL", "BASE_URL", "API_BASE_URL"];
 const GENERIC_MODEL_ALIASES = ["OPENAI_MODEL", "MODEL"];
+const LOCAL_CONFIG_JSON_ENV = "LOCAL_CONFIG_JSON_PATH";
+const JSON_PROVIDER_KEY_FIELDS = ["apikey", "api_key", "api-key", "key", "token"];
+const JSON_PROVIDER_MODEL_FIELDS = [
+  "modelid",
+  "model_id",
+  "model-id",
+  "model",
+  "defaultmodel",
+  "default_model",
+];
+const JSON_PROVIDER_ENDPOINT_FIELDS = [
+  "apiendpoint",
+  "api_endpoint",
+  "api-endpoint",
+  "baseurl",
+  "base_url",
+  "endpoint",
+  "url",
+];
+const JSON_PROVIDER_MODE_FIELDS = [
+  "endpointmode",
+  "endpoint_mode",
+  "baseurlmode",
+  "base_url_mode",
+  "mode",
+];
 
 function allowGenericAliases(provider: AIModelType): boolean {
   return provider === "openai" || provider === "codex";
@@ -168,6 +194,10 @@ function normalizeAliasKey(key: string): string {
   return key.trim().toUpperCase();
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
 function uniqAliases(...aliasGroups: string[][]): string[] {
   return Array.from(
     new Set(aliasGroups.flat().map((item) => normalizeAliasKey(item)))
@@ -238,20 +268,163 @@ function parseJsonRecord(raw: string): Record<string, unknown> {
 }
 
 function toEnvRecord(value: unknown): Record<string, string> {
-  if (!value || typeof value !== "object") {
+  if (!isRecord(value)) {
     return {};
   }
 
-  const source = value as Record<string, unknown>;
   const output: Record<string, string> = {};
 
-  for (const [key, rawValue] of Object.entries(source)) {
+  for (const [key, rawValue] of Object.entries(value)) {
     if (typeof rawValue === "string" && rawValue.trim()) {
       output[normalizeAliasKey(key)] = rawValue.trim();
     }
   }
 
   return output;
+}
+
+function toJsonFieldRecord(value: unknown): Record<string, string> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const output: Record<string, string> = {};
+
+  for (const [key, rawValue] of Object.entries(value)) {
+    if (typeof rawValue === "string" && rawValue.trim()) {
+      output[key.trim().toLowerCase().replace(/[\s_-]+/g, "")] = rawValue.trim();
+    }
+  }
+
+  return output;
+}
+
+function pickJsonFieldValue(record: Record<string, string>, aliases: string[]): string {
+  for (const alias of aliases) {
+    const value = record[alias];
+    if (value?.trim()) {
+      return value.trim();
+    }
+  }
+
+  return "";
+}
+
+function toEndpointMode(
+  endpointMode: string,
+  apiEndpoint: string,
+  defaultEndpoint: string
+): "official" | "custom" {
+  const normalizedMode = endpointMode.trim().toLowerCase();
+  if (normalizedMode === "official" || normalizedMode === "custom") {
+    return normalizedMode;
+  }
+
+  return normalizeEndpoint(apiEndpoint) &&
+    normalizeEndpoint(apiEndpoint) !== normalizeEndpoint(defaultEndpoint)
+    ? "custom"
+    : "official";
+}
+
+async function resolveLocalConfigJsonPaths(): Promise<string[]> {
+  const { path } = await getLocalConfigNodeModules();
+  const cwd = process.cwd();
+  const overridePath =
+    typeof process !== "undefined" ? process.env?.[LOCAL_CONFIG_JSON_ENV]?.trim() || "" : "";
+
+  return Array.from(
+    new Set(
+      [
+        overridePath ? path.resolve(overridePath) : "",
+        path.resolve(cwd, "local-config.json"),
+        path.resolve(cwd, "frontend", "local-config.json"),
+        path.resolve(cwd, "resume-helper", "frontend", "local-config.json"),
+      ].filter(Boolean)
+    )
+  );
+}
+
+function extractJsonConfigSection(
+  parsed: Record<string, unknown>,
+  provider: AIModelType
+): Record<string, unknown> | null {
+  const providers = isRecord(parsed.providers) ? parsed.providers : null;
+  if (providers && isRecord(providers[provider])) {
+    return providers[provider];
+  }
+
+  if (isRecord(parsed[provider])) {
+    return parsed[provider];
+  }
+
+  return null;
+}
+
+async function readJsonLocalConfigByProvider(
+  provider: AIModelType,
+  keyAliases: string[],
+  modelAliases: string[],
+  endpointAliases: string[],
+  defaultModel: string,
+  defaultEndpoint: string
+): Promise<LocalConfigData | null> {
+  const candidatePaths = await resolveLocalConfigJsonPaths();
+
+  for (const filePath of candidatePaths) {
+    const raw = await readFileIfExists(filePath);
+    if (!raw.trim()) {
+      continue;
+    }
+
+    const parsed = parseJsonRecord(raw);
+    const providerSection = extractJsonConfigSection(parsed, provider);
+    const providerJsonFields = toJsonFieldRecord(providerSection);
+    const providerEnvFields = toEnvRecord(providerSection);
+    const rootEnvFields = toEnvRecord(parsed);
+
+    const sectionApiKey =
+      pickJsonFieldValue(providerJsonFields, JSON_PROVIDER_KEY_FIELDS) ||
+      pickFirstValue(providerEnvFields, keyAliases);
+    const sectionModelId =
+      pickJsonFieldValue(providerJsonFields, JSON_PROVIDER_MODEL_FIELDS) ||
+      pickFirstValue(providerEnvFields, modelAliases);
+    const sectionEndpoint =
+      pickJsonFieldValue(providerJsonFields, JSON_PROVIDER_ENDPOINT_FIELDS) ||
+      pickFirstValue(providerEnvFields, endpointAliases);
+    const sectionMode = pickJsonFieldValue(providerJsonFields, JSON_PROVIDER_MODE_FIELDS);
+
+    const rootApiKey = pickFirstValue(rootEnvFields, keyAliases);
+    const rootModelId = pickFirstValue(rootEnvFields, modelAliases);
+    const rootEndpoint = pickFirstValue(rootEnvFields, endpointAliases);
+
+    const apiKey = sectionApiKey || rootApiKey;
+    const modelId = sectionModelId || rootModelId || defaultModel;
+    const apiEndpoint = sectionEndpoint || rootEndpoint || defaultEndpoint;
+    const endpointMode = toEndpointMode(sectionMode, apiEndpoint, defaultEndpoint);
+
+    const hasConfig =
+      Boolean(providerSection) ||
+      Boolean(apiKey) ||
+      Boolean(sectionModelId) ||
+      Boolean(rootModelId) ||
+      Boolean(sectionEndpoint) ||
+      Boolean(rootEndpoint) ||
+      Boolean(sectionMode);
+
+    if (!hasConfig) {
+      continue;
+    }
+
+    return {
+      apiKey,
+      modelId,
+      apiEndpoint,
+      endpointMode,
+      source: [filePath],
+    };
+  }
+
+  return null;
 }
 
 function pickFirstValue(
@@ -310,12 +483,27 @@ async function readLocalConfigByProvider(
   let apiEndpoint = defaultEndpoint;
   let apiKey = "";
 
-  if (codexTomlRaw) {
-    sources.push(codexConfigPath);
+  const jsonConfig = await readJsonLocalConfigByProvider(
+    provider,
+    keyAliases,
+    modelAliases,
+    endpointAliases,
+    defaultModel,
+    defaultEndpoint
+  );
 
+  if (jsonConfig) {
+    sources.push(...jsonConfig.source);
+    apiKey = jsonConfig.apiKey || apiKey;
+    modelId = jsonConfig.modelId || modelId;
+    apiEndpoint = jsonConfig.apiEndpoint || apiEndpoint;
+  }
+
+  if (codexTomlRaw) {
     const providerCandidates = Array.from(
       new Set([provider, ...(providerAliases.tomlProviders || [])])
     );
+    let codexTomlUsed = false;
 
     for (const tomlProvider of providerCandidates) {
       const sectionEndpoint = findTomlStringInSection(
@@ -325,6 +513,7 @@ async function readLocalConfigByProvider(
       );
       if (sectionEndpoint.trim()) {
         apiEndpoint = sectionEndpoint.trim();
+        codexTomlUsed = true;
         break;
       }
     }
@@ -339,6 +528,11 @@ async function readLocalConfigByProvider(
       providerCandidates.includes(configuredProvider)
     ) {
       modelId = configuredModel;
+      codexTomlUsed = true;
+    }
+
+    if (codexTomlUsed) {
+      sources.push(codexConfigPath);
     }
   }
 
@@ -346,28 +540,44 @@ async function readLocalConfigByProvider(
     // Avoid leaking codex auth into other providers (e.g. OpenAI),
     // because auth.json may not contain a valid API key for them.
     if (provider === "codex") {
-      sources.push(codexAuthPath);
       const authRecord = toEnvRecord(parseJsonRecord(codexAuthRaw));
+      let codexAuthUsed = false;
 
       if (!apiKey) {
-        apiKey = pickFirstValue(authRecord, keyAliases);
+        const authApiKey = pickFirstValue(authRecord, keyAliases);
+        if (authApiKey) {
+          apiKey = authApiKey;
+          codexAuthUsed = true;
+        }
       }
 
       if (!modelId) {
-        modelId = pickFirstValue(authRecord, modelAliases) || modelId;
+        const authModelId = pickFirstValue(authRecord, modelAliases);
+        if (authModelId) {
+          modelId = authModelId;
+          codexAuthUsed = true;
+        }
+      }
+
+      if (codexAuthUsed) {
+        sources.push(codexAuthPath);
       }
     }
   }
 
   if (claudeSettingsRaw) {
-    sources.push(claudeSettingsPath);
     const settingsJson = parseJsonRecord(claudeSettingsRaw);
     const settingsEnv = toEnvRecord(settingsJson.env);
     const settingsTopLevel = toEnvRecord(settingsJson);
     const mergedEnv = { ...settingsTopLevel, ...settingsEnv };
+    let claudeSettingsUsed = false;
 
     if (!apiKey) {
-      apiKey = pickFirstValue(mergedEnv, keyAliases);
+      const settingsApiKey = pickFirstValue(mergedEnv, keyAliases);
+      if (settingsApiKey) {
+        apiKey = settingsApiKey;
+        claudeSettingsUsed = true;
+      }
     }
 
     const endpointFromEnv = pickFirstValue(mergedEnv, endpointAliases);
@@ -375,11 +585,17 @@ async function readLocalConfigByProvider(
       normalizeEndpoint(apiEndpoint) === normalizeEndpoint(defaultEndpoint);
     if (endpointFromEnv && useEnvEndpoint) {
       apiEndpoint = endpointFromEnv;
+      claudeSettingsUsed = true;
     }
 
     const modelFromEnv = pickFirstValue(mergedEnv, modelAliases);
     if (modelFromEnv) {
       modelId = modelFromEnv;
+      claudeSettingsUsed = true;
+    }
+
+    if (claudeSettingsUsed) {
+      sources.push(claudeSettingsPath);
     }
   }
 

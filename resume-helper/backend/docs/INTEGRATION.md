@@ -1,5 +1,7 @@
 # Resume Helper - 项目整合完成
 
+> 结构说明：当前项目代码位于 `resume-helper/` 目录下，并按 `backend/` 与 `frontend/` 两部分组织。
+
 ## 项目结构
 
 ```

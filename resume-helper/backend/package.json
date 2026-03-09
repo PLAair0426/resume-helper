@@ -1,0 +1,23 @@
+{
+  "name": "resume-helper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered resume optimization system with separated backend and frontend apps",
+  "scripts": {
+    "dev": "node scripts/run-services.mjs dev",
+    "dev:backend": "python -m uvicorn backend.main:app --app-dir .. --reload --reload-dir . --port 8000",
+    "dev:frontend": "npm --prefix ../frontend run dev",
+    "build": "npm run build:frontend",
+    "build:frontend": "npm --prefix ../frontend run build",
+    "start": "node scripts/run-services.mjs start",
+    "start:backend": "python -m uvicorn backend.main:app --app-dir .. --host 0.0.0.0 --port 8000",
+    "start:frontend": "npm --prefix ../frontend run start",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "python -c \"import pytest, sys; rc = pytest.main(['tests']); sys.exit(0 if rc == 5 else rc)\"",
+    "test:frontend": "npm --prefix ../frontend run --if-present test"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

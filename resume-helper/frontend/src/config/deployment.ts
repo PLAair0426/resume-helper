@@ -2,6 +2,19 @@ function normalizeUrl(value: string | null | undefined): string {
   return (value || "").trim().replace(/\/+$/, "");
 }
 
+function inferProtocol(hostOrUrl: string): "http" | "https" {
+  const normalized = hostOrUrl.toLowerCase();
+  if (
+    normalized.startsWith("localhost") ||
+    normalized.startsWith("127.0.0.1") ||
+    normalized.startsWith("0.0.0.0")
+  ) {
+    return "http";
+  }
+
+  return "https";
+}
+
 const rawLocalConfigFlag = import.meta.env.VITE_ENABLE_LOCAL_CONFIG;
 
 export const LOCAL_CONFIG_ENABLED =
@@ -26,7 +39,7 @@ export function resolveAgentApiUrl(): string {
     if (hostPort.startsWith("http://") || hostPort.startsWith("https://")) {
       return hostPort;
     }
-    return `http://${hostPort}`;
+    return `${inferProtocol(hostPort)}://${hostPort}`;
   }
 
   return "http://localhost:8000";

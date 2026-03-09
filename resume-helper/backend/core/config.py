@@ -4,6 +4,25 @@ from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
+WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+DEFAULT_DATABASE_URL = f"sqlite+aiosqlite:///{(BACKEND_DIR / 'resume_agent.db').as_posix()}"
+DEFAULT_UPLOAD_DIR = BACKEND_DIR / "uploads"
+DEFAULT_EXPORT_DIR = BACKEND_DIR / "exports"
+DEFAULT_CONSTITUTION_DIR = BACKEND_DIR / "constitution"
+DEFAULT_KNOWLEDGE_DIR = BACKEND_DIR / "knowledge"
+DEFAULT_TEMPLATES_DIR = DEFAULT_KNOWLEDGE_DIR / "templates"
+COMMON_SETTINGS_CONFIG = {
+    "env_file": (
+        str(WORKSPACE_ROOT / ".env"),
+        str(PROJECT_ROOT / ".env"),
+        str(BACKEND_DIR / ".env"),
+    ),
+    "env_file_encoding": "utf-8",
+    "extra": "ignore",
+}
+
 
 class LLMConfig(BaseSettings):
     """LLM provider configuration."""
@@ -21,27 +40,27 @@ class LLMConfig(BaseSettings):
     max_retries: int = 3
     timeout: int = 60
 
-    model_config = {"env_prefix": "LLM_", "extra": "ignore"}
+    model_config = {**COMMON_SETTINGS_CONFIG, "env_prefix": "LLM_"}
 
 
 class DatabaseConfig(BaseSettings):
     """Database configuration."""
 
-    url: str = Field("sqlite+aiosqlite:///./resume_agent.db", alias="DATABASE_URL")
+    url: str = Field(DEFAULT_DATABASE_URL, alias="DATABASE_URL")
     echo: bool = False
 
-    model_config = {"extra": "ignore"}
+    model_config = COMMON_SETTINGS_CONFIG
 
 
 class StorageConfig(BaseSettings):
     """Storage configuration."""
 
-    upload_dir: Path = Path("./uploads")
-    export_dir: Path = Path("./exports")
+    upload_dir: Path = DEFAULT_UPLOAD_DIR
+    export_dir: Path = DEFAULT_EXPORT_DIR
     max_file_size_mb: int = 10
     allowed_extensions: list[str] = [".pdf", ".docx", ".doc", ".txt", ".md"]
 
-    model_config = {"env_prefix": "STORAGE_", "extra": "ignore"}
+    model_config = {**COMMON_SETTINGS_CONFIG, "env_prefix": "STORAGE_"}
 
 
 class PrivacyConfig(BaseSettings):
@@ -54,7 +73,7 @@ class PrivacyConfig(BaseSettings):
     anonymize_llm_input: bool = True
     encrypt_pii: bool = True
 
-    model_config = {"env_prefix": "PRIVACY_", "extra": "ignore"}
+    model_config = {**COMMON_SETTINGS_CONFIG, "env_prefix": "PRIVACY_"}
 
 
 class Settings(BaseSettings):
@@ -78,12 +97,14 @@ class Settings(BaseSettings):
     storage: StorageConfig = StorageConfig()
     privacy: PrivacyConfig = PrivacyConfig()
 
-    base_dir: Path = Path(__file__).parent.parent.parent
-    constitution_dir: Path = base_dir / "constitution"
-    knowledge_dir: Path = base_dir / "knowledge"
-    templates_dir: Path = base_dir / "knowledge" / "templates"
+    workspace_dir: Path = WORKSPACE_ROOT
+    repo_dir: Path = PROJECT_ROOT
+    base_dir: Path = BACKEND_DIR
+    constitution_dir: Path = DEFAULT_CONSTITUTION_DIR
+    knowledge_dir: Path = DEFAULT_KNOWLEDGE_DIR
+    templates_dir: Path = DEFAULT_TEMPLATES_DIR
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
+    model_config = COMMON_SETTINGS_CONFIG
 
 
 settings = Settings()

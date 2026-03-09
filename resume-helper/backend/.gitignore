@@ -6,13 +6,8 @@ Thumbs.db
 *.swp
 *.swo
 
-# Local agent / tool settings
-.claude/
-.codex/
-
 # Node.js
 node_modules/
-.npm-cache/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -24,24 +19,16 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
-.venv/
-venv/
 
 # Environment / secrets
 .env
 .env.*
 !.env.example
-**/.env
-**/.env.*
-!**/.env.example
 
 # Build artifacts
-dist/
 build/
 coverage/
 .cache/
-.tanstack/
-*.tsbuildinfo
 
 # Logs / runtime data
 *.log
@@ -53,12 +40,7 @@ coverage/
 *.sqlite3
 
 # Project-local generated files
-resume-helper/uploads/
-resume-helper/exports/
-resume-helper/encoding-report*.json
-resume-helper/frontend/.tmp-*
-resume-helper/frontend/node_modules/
-resume-helper/frontend/dist/
-resume-helper/node_modules/
-resume-helper/.venv/
-
+uploads/
+exports/
+docs/diagnostics/encoding-report*.json
+docs/diagnostics/*.log

@@ -1,0 +1,34 @@
+{
+  "providers": {
+    "deepseek": {
+      "apiKey": "your-deepseek-api-key",
+      "modelId": "deepseek-chat",
+      "apiEndpoint": "https://api.deepseek.com/v1",
+      "endpointMode": "official"
+    },
+    "openai": {
+      "apiKey": "your-openai-api-key",
+      "modelId": "gpt-4o",
+      "apiEndpoint": "https://api.openai.com/v1",
+      "endpointMode": "official"
+    },
+    "anthropic": {
+      "apiKey": "your-anthropic-api-key",
+      "modelId": "claude-sonnet-4-20250514",
+      "apiEndpoint": "https://api.anthropic.com",
+      "endpointMode": "official"
+    },
+    "gemini": {
+      "apiKey": "your-gemini-api-key",
+      "modelId": "gemini-2.0-flash",
+      "apiEndpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "endpointMode": "official"
+    },
+    "codex": {
+      "apiKey": "your-openai-api-key",
+      "modelId": "gpt-4o",
+      "apiEndpoint": "https://api.openai.com/v1",
+      "endpointMode": "official"
+    }
+  }
+}

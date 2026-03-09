@@ -1,5 +1,7 @@
 # Resume Helper
 
+> 结构说明：当前项目代码位于 `resume-helper/` 目录下，并按 `backend/` 与 `frontend/` 两部分组织。
+
 `Resume Helper` 是一个面向简历生成与优化场景的 AI 应用，提供从简历导入、结构化解析、岗位 JD 分析、ATS 审核、关键词覆盖评估，到多版本生成和多格式导出的完整工作流。
 
 项目采用前后端分离架构：

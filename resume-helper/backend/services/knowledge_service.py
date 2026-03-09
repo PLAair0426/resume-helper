@@ -13,7 +13,7 @@ from backend.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-KNOWLEDGE_DIR = Path(__file__).parent.parent.parent / "knowledge"
+KNOWLEDGE_DIR = settings.knowledge_dir
 
 
 class KnowledgeCollection:

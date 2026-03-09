@@ -1,5 +1,7 @@
 # Resume Helper - 测试报告
 
+> 结构说明：本报告中的 `resume-helper/` 指当前项目目录 `resume-helper/`。
+
 **测试时间**: 2026-03-02
 **项目路径**: `h:\简历助手\resume-helper\`
 
