@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     # Use APP_DEBUG to avoid collision with global DEBUG=release.
     debug: bool = Field(True, alias="APP_DEBUG")
     host: str = "0.0.0.0"
-    port: int = 8000
+    port: int = Field(8000, alias="PORT")
     cors_origins: list[str] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",

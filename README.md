@@ -28,6 +28,7 @@ npm run dev
 完整项目文档见：
 
 - `resume-helper/README.md`
+- `render.yaml`
 
 ## 安全说明
 

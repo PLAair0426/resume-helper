@@ -3,7 +3,7 @@
  * 统一转发请求到FastAPI后端
  */
 
-const AGENT_API_URL = import.meta.env.VITE_AGENT_API_URL || "http://localhost:8000";
+import { resolveAgentApiUrl } from "@/config/deployment";
 
 async function safeReadRequestJson(
   request: Request
@@ -71,7 +71,7 @@ export async function proxyToAgent(
       { status: 200 }
     );
   }
-  const targetUrl = `${AGENT_API_URL}/api/v1${path}`;
+  const targetUrl = `${resolveAgentApiUrl()}/api/v1${path}`;
 
   try {
     const response = await fetch(targetUrl, {
@@ -108,7 +108,7 @@ export async function proxyToAgent(
 export async function proxyUploadToAgent(
   request: Request
 ): Promise<Response> {
-  const targetUrl = `${AGENT_API_URL}/api/v1/upload`;
+  const targetUrl = `${resolveAgentApiUrl()}/api/v1/upload`;
 
   try {
     // 直接转发FormData

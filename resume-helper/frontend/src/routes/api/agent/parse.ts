@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { resolveAgentApiUrl } from "@/config/deployment";
 
 async function safeReadRequestJson(
   request: Request
@@ -58,9 +59,8 @@ export const Route = createFileRoute("/api/agent/parse")({
           return Response.json({ status: "error", message: "缺少session_id" }, { status: 400 });
         }
 
-        const AGENT_API_URL = import.meta.env.VITE_AGENT_API_URL || "http://localhost:8000";
         try {
-          const response = await fetch(`${AGENT_API_URL}/api/v1/parse/${sessionId}`, {
+          const response = await fetch(`${resolveAgentApiUrl()}/api/v1/parse/${sessionId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(credentials),

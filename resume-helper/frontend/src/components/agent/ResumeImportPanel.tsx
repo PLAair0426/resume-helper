@@ -20,6 +20,7 @@ import {
   getModelId,
   type AIModelType,
 } from "@/config/ai";
+import { LOCAL_CONFIG_ENABLED } from "@/config/deployment";
 
 interface ParseResult {
   profile: any;
@@ -94,7 +95,7 @@ export function ResumeImportPanel({
         configProvider !== "codex" && /codex/i.test(creds.modelId || "");
 
       // 缺少 API Key，或发现非 codex 模型却携带 codex 配置时，兜底读取本地配置。
-      if (!creds.apiKey?.trim() || hasCodexLeak) {
+      if (LOCAL_CONFIG_ENABLED && (!creds.apiKey?.trim() || hasCodexLeak)) {
         const providerMeta = AI_PROVIDERS[configProvider];
 
         try {

@@ -357,6 +357,58 @@ docker-compose up -d
 - 前端映射端口：`3000:3000`
 - PostgreSQL 映射端口：`5432:5432`
 
+### 8.4 Cloudflare + Render 部署
+
+项目当前已经补齐一套推荐的生产部署组合：
+
+- 前端部署到 `Cloudflare Workers`
+- 后端部署到 `Render Web Service`
+- Render 蓝图文件位于仓库根目录：`render.yaml`
+
+#### Cloudflare 前端
+
+前端目录中已包含 `wrangler.toml`，并提供了部署脚本：
+
+```bash
+cd frontend
+npm run deploy:cloudflare
+```
+
+如果只想验证打包结果：
+
+```bash
+cd frontend
+npm run deploy:cloudflare:dry-run
+```
+
+#### Render 后端 / 前端
+
+仓库根目录包含 `render.yaml`，可直接用于 Render Blueprint：
+
+- 后端服务：`resume-helper-api`
+- 前端服务：`resume-helper-web`
+- PostgreSQL：`resume-helper-db`
+
+部署时请注意：
+
+- 后端现在会自动读取 Render 注入的 `PORT`
+- `DATABASE_URL` 支持将 `postgresql://` 自动转换为 `postgresql+asyncpg://`
+- 生产环境默认禁用 `/api/local-config`
+- 生产环境建议手动在前端 UI 中输入 API Key，不再从服务器本地配置文件回填
+
+#### 与部署相关的环境变量
+
+| 变量名 | 用途 |
+| --- | --- |
+| `PORT` | Render 后端监听端口 |
+| `DATABASE_URL` | PostgreSQL 连接串，支持 Render 默认格式 |
+| `STORAGE_UPLOAD_DIR` | 上传目录，Render 蓝图默认使用 `/tmp/uploads` |
+| `STORAGE_EXPORT_DIR` | 导出目录，Render 蓝图默认使用 `/tmp/exports` |
+| `AGENT_API_HOSTPORT` | Render 前端通过私网访问后端时使用 |
+| `VITE_AGENT_API_URL` | Cloudflare / 自定义前端代理目标地址 |
+| `VITE_ENABLE_LOCAL_CONFIG` | 是否允许前端读取服务器本地配置，生产建议关闭 |
+| `ENABLE_LOCAL_CONFIG_API` | 是否在服务端启用 `/api/local-config`，生产建议关闭 |
+
 ---
 
 ## 9. API 概览

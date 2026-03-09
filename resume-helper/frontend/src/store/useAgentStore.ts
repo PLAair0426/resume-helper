@@ -20,6 +20,7 @@ import {
   getModelId,
   type AIModelType,
 } from "@/config/ai";
+import { LOCAL_CONFIG_ENABLED } from "@/config/deployment";
 import { useAIConfigStore } from "./useAIConfigStore";
 
 function extractAgentError(json: unknown, fallback: string): string {
@@ -46,7 +47,7 @@ async function ensureAICredentials(): Promise<{
   const hasCodexLeak =
     configProvider !== "codex" && /codex/i.test(creds.modelId || "");
 
-  if (!creds.apiKey?.trim() || hasCodexLeak) {
+  if (LOCAL_CONFIG_ENABLED && (!creds.apiKey?.trim() || hasCodexLeak)) {
     const providerMeta = AI_PROVIDERS[configProvider];
 
     try {

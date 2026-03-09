@@ -4,7 +4,23 @@ from sqlalchemy.orm import DeclarativeBase
 
 from backend.core.config import settings
 
-engine = create_async_engine(settings.database.url, echo=settings.database.echo)
+
+def normalize_database_url(database_url: str) -> str:
+    """Normalize configured URLs to async SQLAlchemy drivers."""
+
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql+asyncpg://", 1)
+
+    if database_url.startswith("postgresql://"):
+        return database_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    return database_url
+
+
+engine = create_async_engine(
+    normalize_database_url(settings.database.url),
+    echo=settings.database.echo,
+)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

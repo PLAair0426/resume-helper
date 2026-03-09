@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
 import { AI_PROVIDERS, AI_PROVIDER_IDS, type AIModelType } from "@/config/ai";
+import { isServerLocalConfigEnabled } from "@/config/deployment";
 
 interface LocalConfigRequestBody {
   provider?: string;
@@ -25,6 +23,26 @@ async function safeReadRequestBody(
   } catch {
     return null;
   }
+}
+
+interface LocalConfigNodeModules {
+  fs: typeof import("node:fs/promises");
+  os: typeof import("node:os");
+  path: typeof import("node:path");
+}
+
+let localConfigNodeModulesPromise: Promise<LocalConfigNodeModules> | null = null;
+
+async function getLocalConfigNodeModules(): Promise<LocalConfigNodeModules> {
+  if (!localConfigNodeModulesPromise) {
+    localConfigNodeModulesPromise = Promise.all([
+      import("node:fs/promises"),
+      import("node:os"),
+      import("node:path"),
+    ]).then(([fs, os, path]) => ({ fs, os, path }));
+  }
+
+  return localConfigNodeModulesPromise;
 }
 
 interface LocalConfigData {
@@ -196,6 +214,7 @@ function findTomlStringInSection(
 
 async function readFileIfExists(filePath: string): Promise<string> {
   try {
+    const { fs } = await getLocalConfigNodeModules();
     return await fs.readFile(filePath, "utf8");
   } catch {
     return "";
@@ -252,6 +271,7 @@ async function readLocalConfigByProvider(
   provider: AIModelType,
   inputDefaults: Pick<LocalConfigRequestBody, "defaultEndpoint" | "defaultModel">
 ): Promise<LocalConfigData> {
+  const { os, path } = await getLocalConfigNodeModules();
   const home = os.homedir();
   const codexConfigPath = path.join(home, ".codex", "config.toml");
   const codexAuthPath = path.join(home, ".codex", "auth.json");
@@ -422,6 +442,17 @@ export const Route = createFileRoute("/api/local-config")({
     handlers: {
       POST: async ({ request }) => {
         try {
+          if (!isServerLocalConfigEnabled()) {
+            return Response.json(
+              {
+                status: "error",
+                message:
+                  "Local config API is disabled in deployed environments. Please enter your API key manually.",
+              },
+              { status: 403 }
+            );
+          }
+
           const body = await safeReadRequestBody(request);
           if (!body) {
             return Response.json(

@@ -1,4 +1,5 @@
 """FastAPI应用入口"""
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -55,3 +56,11 @@ app.include_router(knowledge.router, prefix="/api/v1", tags=["knowledge"])
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "version": settings.version}
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "backend.main:app",
+        host=settings.host,
+        port=settings.port,
+    )

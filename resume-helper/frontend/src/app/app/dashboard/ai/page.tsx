@@ -18,6 +18,7 @@ import {
   isProviderConfigured,
   type AIModelType,
 } from "@/config/ai";
+import { LOCAL_CONFIG_ENABLED } from "@/config/deployment";
 import { cn } from "@/lib/utils";
 
 type ProviderModelMap = Partial<Record<AIModelType, string[]>>;
@@ -66,7 +67,8 @@ const AISettingsPage = () => {
 
   const currentCreds = getCredentials(currentModel);
   const meta = AI_PROVIDERS[currentModel];
-  const showLocalConfigPanel = AI_PROVIDER_IDS.includes(currentModel);
+  const showLocalConfigPanel =
+    LOCAL_CONFIG_ENABLED && AI_PROVIDER_IDS.includes(currentModel);
   const useLocalReadOnlyPanel = showLocalConfigPanel && localConfigHasApiKey && !forceManual;
   const endpointMode = currentCreds.endpointMode === "custom" ? "custom" : "official";
   const effectiveEndpoint = getEffectiveEndpoint(currentModel, currentCreds);
