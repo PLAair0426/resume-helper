@@ -3,6 +3,12 @@ main = "dist/server/server.js"
 compatibility_date = "2026-03-09"
 compatibility_flags = ["nodejs_compat"]
 keep_vars = true
+workers_dev = true
+preview_urls = true
+
+[[routes]]
+pattern = "resume-helper.sydbw.cc.cd"
+custom_domain = true
 
 [assets]
 directory = "dist/client"
